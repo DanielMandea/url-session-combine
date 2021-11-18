@@ -12,4 +12,8 @@ open class BaseRestService: SessionHolder, RestService {
     // MARK: - SessionHolder
     
     public var session: URLSession { URLSession.shared }
+    
+    // MARK: - Init
+    
+    public init() {}
 }
