@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class BaseRestService: SessionHolder, RestService {
+open class BaseRestService: SessionHolder, RestService {
     
     // MARK: - SessionHolder
     
