@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  URLRequestExtension.swift
 //  
 //
 //  Created by Daniel Mandea on 18.11.2021.
@@ -7,17 +7,16 @@
 
 import Foundation
 
-
 extension URLRequest {
     
-    static func empty(for url: URL, method: HttpMethod, headers: [String: String]? = nil) -> URLRequest {
+    public static func empty(for url: URL, method: HttpMethod, headers: [String: String]? = nil) -> URLRequest {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         urlRequest.allHTTPHeaderFields = headers
         return urlRequest
     }
     
-    static func request<T: Codable>(for url: URL, method: HttpMethod, headers: [String: String]? = nil , httpBody: T? = nil, encoder: JSONEncoder) -> URLRequest {
+    public static func request<T: Codable>(for url: URL, method: HttpMethod, headers: [String: String]? = nil , httpBody: T? = nil, encoder: JSONEncoder) -> URLRequest {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         urlRequest.allHTTPHeaderFields = headers
@@ -27,7 +26,7 @@ extension URLRequest {
         return urlRequest
     }
     
-    static func multipart<T: Codable>(for url: URL, method: HttpMethod = .POST, headers: [String: String]? = nil, payload: T? = nil, multiparts: [Multipart], encoder: JSONEncoder, decoder: JSONDecoder) -> URLRequest {
+    public static func multipart<T: Codable>(for url: URL, method: HttpMethod = .POST, headers: [String: String]? = nil, payload: T? = nil, multiparts: [Multipart], encoder: JSONEncoder, decoder: JSONDecoder) -> URLRequest {
         URLRequest(multipartFormData: { (formData) in
             if let payloadData = try? CodableToDictionary.transform(payload: payload, encoder: encoder, decoder: decoder) {
                 for key in payloadData.keys {
