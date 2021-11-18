@@ -18,7 +18,7 @@ public struct Multipart: Codable {
     
     // MARK: - Public Init
     
-    internal init(key: String, data: Data, mimeType: MimeType, fileName: String) {
+    public init(key: String, data: Data, mimeType: MimeType, fileName: String) {
         self.key = key
         self.data = data
         self.mimeType = mimeType
