@@ -21,7 +21,7 @@ public class MultipartFormData {
     
     // MARK: - Internal 
     
-    func append(value: String, name: String) {
+    func append(value: Codable, name: String) {
         request.httpBody?.append("--\(boundary)\r\n".data())
         request.httpBody?.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n".data())
         request.httpBody?.append("\(value)\r\n".data())

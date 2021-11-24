@@ -6,11 +6,11 @@
 //
 
 import Foundation
+import AnyCodable
 
 struct CodableToDictionary {
-    static func transform<T: Codable>(payload: T, encoder: JSONEncoder, decoder: JSONDecoder) throws -> [String:String] {
+    static func transform<T: Codable>(payload: T, encoder: JSONEncoder, decoder: JSONDecoder) throws -> [String: AnyCodable] {
         let data = try encoder.encode(payload)
-        return try decoder.decode([String: String].self, from: data)
+        return try decoder.decode([String: AnyCodable].self, from: data)
     }
-
 }
