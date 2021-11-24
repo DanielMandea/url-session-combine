@@ -25,6 +25,11 @@ extension RestService where Self: SessionHolder {
     }
     
     @available(iOS 13.0, *)
+    public func multipart<T: Codable, M: Codable>(to url: URL, body: M? = nil, headers: [String: String] = [:], multiparts: [Multipart], encoder: JSONEncoder, decoder: JSONDecoder) -> AnyPublisher<T, Error> {
+        task(for: URLRequest.multipart(for: url, payload: body, multiparts: multiparts, encoder: encoder, decoder: decoder), decoder: decoder)
+    }
+    
+    @available(iOS 13.0, *)
     public func delete(for url: URL, headers: [String: String] = ["Content-Type":"application/json"]) -> AnyPublisher<Bool, Error> {
         session.boolTaskPublisher(for: URLRequest.empty(for: url, method: .DELETE, headers: headers))
     }

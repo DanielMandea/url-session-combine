@@ -19,6 +19,9 @@ public protocol RestService {
     func put<T: Codable, M: Codable>(to url: URL, body: M, headers: [String: String], decoder: JSONDecoder, encoder: JSONEncoder) -> AnyPublisher<T, Error>
     
     @available(iOS 13.0, *)
+    func multipart<T: Codable, M: Codable>(to url: URL, body: M?, headers: [String: String], multiparts: [Multipart], encoder: JSONEncoder, decoder: JSONDecoder) -> AnyPublisher<T, Error>
+    
+    @available(iOS 13.0, *)
     func delete(for url: URL, headers: [String: String]) -> AnyPublisher<Bool, Error>
     
     @available(iOS 14.0, *)
