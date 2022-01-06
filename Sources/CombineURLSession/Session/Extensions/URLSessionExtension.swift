@@ -17,7 +17,9 @@ extension URLSession {
                 guard let httpResponse = element.response as? HTTPURLResponse, httpResponse.statusCode < 300 else { throw URLError(.badServerResponse)}
                 return true
             }
-            .mapError { SessionError.generic(error: $0) }
+            .mapError {
+                SessionError.generic(error: $0)
+            }
             .eraseToAnyPublisher()
     }
     
@@ -30,7 +32,9 @@ extension URLSession {
                 return element.data
             }
             .decode(type: T.self, decoder: decoder)
-            .mapError { SessionError.generic(error: $0) }
+            .mapError {
+                SessionError.generic(error: $0)
+            }
             .eraseToAnyPublisher()
     }
     
@@ -43,7 +47,9 @@ extension URLSession {
                 return element.data
             }
             .decode(type: T.self, decoder: decoder)
-            .mapError { SessionError.generic(error: $0) }
+            .mapError {
+                SessionError.generic(error: $0)
+            }
             .eraseToAnyPublisher()
     }
     
@@ -56,7 +62,9 @@ extension URLSession {
                 return element.data
             }
             .decode(type: T.self, decoder: decoder)
-            .mapError { SessionError.generic(error: $0) }
+            .mapError {
+                SessionError.generic(error: $0)
+            }
             .eraseToAnyPublisher()
     }
 }

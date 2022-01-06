@@ -13,14 +13,10 @@ enum SessionError: Error, Identifiable {
     case decode
     case generic(error: Error)
     
-    var localizedDescription: String {
+    var errorDescription: String? {
         switch self {
-        case .unknown:
-            return "Unknown Error"
-        case .decode:
-            return "Decoding Error"
-        case .generic(let error):
-            return "Generic Error" + error.localizedDescription
+        case .unknown: return "Unknown error"
+        case .generic(let error): return error.localizedDescription
         }
     }
 }
