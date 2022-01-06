@@ -10,7 +10,6 @@ import Foundation
 enum SessionError: Error, Identifiable {
     var id: String { self.localizedDescription }
     case unknown
-    case decode
     case generic(error: Error)
     
     var errorDescription: String? {
