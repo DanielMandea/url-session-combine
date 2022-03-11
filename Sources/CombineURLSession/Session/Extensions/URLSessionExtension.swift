@@ -11,7 +11,7 @@ import Combine
 extension URLSession {
     @available(iOS 13.0, *)
     public func boolTaskPublisher(for urlRequest: URLRequest) -> AnyPublisher<Bool, Error> {
-       dataTaskPublisher(for: urlRequest)
+        dataTaskPublisher(for: urlRequest)
             .receive(on: RunLoop.main)
             .tryMap() { element -> Bool in
                 guard let httpResponse = element.response as? HTTPURLResponse, httpResponse.statusCode < 300 else { throw URLError(.badServerResponse)}
@@ -27,11 +27,12 @@ extension URLSession {
     public func dataTaskPublisher<T: Codable>(for urlRequest: URLRequest, decoder: JSONDecoder) -> AnyPublisher<T, Error> {
         dataTaskPublisher(for: urlRequest)
             .receive(on: RunLoop.main)
-            .tryMap() { element -> Data in
-                guard let httpResponse = element.response as? HTTPURLResponse, httpResponse.statusCode < 300 else {throw URLError(.badServerResponse) }
-                return element.data
+            .tryMap { output -> Data in
+                try URLSession.validate(output: output)
             }
-            .decode(type: T.self, decoder: decoder)
+            .tryMap {
+                try URLSession.decode(decoder: decoder, data: $0)
+            }
             .mapError {
                 SessionError.generic(error: $0)
             }
@@ -42,11 +43,12 @@ extension URLSession {
     public func dataTaskPublisher<T: Codable>(for url: URL, decoder: JSONDecoder) -> AnyPublisher<T, Error> {
         dataTaskPublisher(for: url)
             .receive(on: RunLoop.main)
-            .tryMap() { element -> Data in
-                guard let httpResponse = element.response as? HTTPURLResponse, httpResponse.statusCode == 200 else { throw URLError(.badServerResponse) }
-                return element.data
+            .tryMap { output -> Data in
+                try URLSession.validate(output: output)
             }
-            .decode(type: T.self, decoder: decoder)
+            .tryMap {
+                try URLSession.decode(decoder: decoder, data: $0)
+            }
             .mapError {
                 SessionError.generic(error: $0)
             }
@@ -57,14 +59,44 @@ extension URLSession {
     public func dataCachePublisher<T: Codable>(for urlRequest: URLRequest, decoder: JSONDecoder) -> AnyPublisher<T, Error>? {
         configuration.urlCache?.cachedResponse(for: urlRequest).publisher
             .receive(on: RunLoop.main)
-            .tryMap() { element -> Data in
-                guard let httpResponse = element.response as? HTTPURLResponse, httpResponse.statusCode == 200 else { throw URLError(.badServerResponse) }
-                return element.data
+            .tryMap { element -> Data in
+                try URLSession.validate(element: element)
             }
-            .decode(type: T.self, decoder: decoder)
+            .tryMap {
+                try URLSession.decode(decoder: decoder, data: $0)
+            }
             .mapError {
                 SessionError.generic(error: $0)
             }
             .eraseToAnyPublisher()
+    }
+    
+    static func validate(element: CachedURLResponse) throws -> Data {
+        // Cheks http response
+        guard let httpResponse = element.response as? HTTPURLResponse, httpResponse.statusCode < 300 else { throw SessionError.network(error: URLError(.badServerResponse)) }
+        // Cheks we can decode the obj
+        return element.data
+    }
+    
+    @available(iOS 13.0, *)
+    static func validate(output: URLSession.DataTaskPublisher.Output) throws -> Data {
+        // Cheks http response
+        guard let httpResponse = output.response as? HTTPURLResponse, httpResponse.statusCode < 300 else { throw SessionError.network(error: URLError(.badServerResponse)) }
+        // Cheks we can decode the obj
+        return output.data
+    }
+    
+    static func decode<T: Codable>(decoder: JSONDecoder, data: Data) throws -> T {
+        // Cheks we can decode the obj
+        guard let value = try? decoder.decode(T.self, from: data) else {
+            // Cheks we can decode the error
+            guard let error = try? decoder.decode(TextError.self, from: data) else {
+                // Send generic error
+                let errorStr = String(data: data, encoding: .utf8)
+                throw SessionError.text(error: TextError(error: errorStr))
+            }
+            throw SessionError.text(error: error)
+        }
+        return value
     }
 }
