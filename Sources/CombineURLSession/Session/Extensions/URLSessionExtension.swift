@@ -33,9 +33,6 @@ extension URLSession {
             .tryMap {
                 try URLSession.decode(decoder: decoder, data: $0)
             }
-            .mapError {
-                SessionError.generic(error: $0)
-            }
             .eraseToAnyPublisher()
     }
     
@@ -49,9 +46,6 @@ extension URLSession {
             .tryMap {
                 try URLSession.decode(decoder: decoder, data: $0)
             }
-            .mapError {
-                SessionError.generic(error: $0)
-            }
             .eraseToAnyPublisher()
     }
     
@@ -64,9 +58,6 @@ extension URLSession {
             }
             .tryMap {
                 try URLSession.decode(decoder: decoder, data: $0)
-            }
-            .mapError {
-                SessionError.generic(error: $0)
             }
             .eraseToAnyPublisher()
     }
