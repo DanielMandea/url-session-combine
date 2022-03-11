@@ -82,24 +82,27 @@ extension URLSession {
     static func validate(output: URLSession.DataTaskPublisher.Output) throws -> Data {
         // Cheks http response
         guard let httpResponse = output.response as? HTTPURLResponse, httpResponse.statusCode < 300 else {
-            let error = String(data: output.data, encoding: .utf8)
-            if error != "" { throw SessionError.network(error: URLError(.badServerResponse))}
-            else { throw SessionError.text(error: TextError(error: error))}
+            // Cheks if we can decode the error
+            throw URLSession.decodeError(decoder: decoder, data: data)
         }
-        // Cheks we can decode the obj
+        // Returns the output 
         return output.data
+    }
+    
+    static func decodeError(decoder: JSONDecoder, data: Data) throws -> TextError {
+        guard let error = try? decoder.decode(TextError.self, from: data) else {
+            // Send generic error
+            let errorStr = String(data: data, encoding: .utf8)
+            throw SessionError.text(error: TextError(error: errorStr))
+        }
+        throw SessionError.text(error: error)
     }
     
     static func decode<T: Codable>(decoder: JSONDecoder, data: Data) throws -> T {
         // Cheks we can decode the obj
         guard let value = try? decoder.decode(T.self, from: data) else {
-            // Cheks we can decode the error
-            guard let error = try? decoder.decode(TextError.self, from: data) else {
-                // Send generic error
-                let errorStr = String(data: data, encoding: .utf8)
-                throw SessionError.text(error: TextError(error: errorStr))
-            }
-            throw SessionError.text(error: error)
+            // Cheks if we can decode the error
+            throw URLSession.decodeError(decoder: decoder, data: data)
         }
         return value
     }
