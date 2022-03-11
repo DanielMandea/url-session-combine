@@ -81,7 +81,11 @@ extension URLSession {
     @available(iOS 13.0, *)
     static func validate(output: URLSession.DataTaskPublisher.Output) throws -> Data {
         // Cheks http response
-        guard let httpResponse = output.response as? HTTPURLResponse, httpResponse.statusCode < 300 else { throw SessionError.network(error: URLError(.badServerResponse)) }
+        guard let httpResponse = output.response as? HTTPURLResponse, httpResponse.statusCode < 300 else {
+            let error = String(data: output.data, encoding: .utf8)
+            if error != "" { throw SessionError.network(error: URLError(.badServerResponse))}
+            else { throw SessionError.text(error: TextError(error: error))}
+        }
         // Cheks we can decode the obj
         return output.data
     }
