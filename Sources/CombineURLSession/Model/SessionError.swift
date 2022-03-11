@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum SessionError: Error, Identifiable {
-    var id: String { self.localizedDescription }
+public enum SessionError: Error, Identifiable {
+    public var id: String { self.localizedDescription }
     case unknown
     case decode
     case network(error: URLError)

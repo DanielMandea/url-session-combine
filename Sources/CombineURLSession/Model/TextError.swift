@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct TextError: Error, Codable {
-    var error: String?
+public struct TextError: Error, Codable {
+    public var error: String?
 }
