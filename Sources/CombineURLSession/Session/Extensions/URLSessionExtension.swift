@@ -28,7 +28,7 @@ extension URLSession {
         dataTaskPublisher(for: urlRequest)
             .receive(on: RunLoop.main)
             .tryMap { output -> Data in
-                try URLSession.validate(output: output)
+                try URLSession.validate(decoder: decoder, output: output)
             }
             .tryMap {
                 try URLSession.decode(decoder: decoder, data: $0)
@@ -44,7 +44,7 @@ extension URLSession {
         dataTaskPublisher(for: url)
             .receive(on: RunLoop.main)
             .tryMap { output -> Data in
-                try URLSession.validate(output: output)
+                try URLSession.validate(decoder: decoder, output: output)
             }
             .tryMap {
                 try URLSession.decode(decoder: decoder, data: $0)
@@ -79,13 +79,13 @@ extension URLSession {
     }
     
     @available(iOS 13.0, *)
-    static func validate(output: URLSession.DataTaskPublisher.Output) throws -> Data {
+    static func validate(decoder: JSONDecoder, output: URLSession.DataTaskPublisher.Output) throws -> Data {
         // Cheks http response
         guard let httpResponse = output.response as? HTTPURLResponse, httpResponse.statusCode < 300 else {
             // Cheks if we can decode the error
-            throw URLSession.decodeError(decoder: decoder, data: data)
+            throw try URLSession.decodeError(decoder: decoder, data: output.data)
         }
-        // Returns the output 
+        // Returns the output
         return output.data
     }
     
@@ -102,7 +102,7 @@ extension URLSession {
         // Cheks we can decode the obj
         guard let value = try? decoder.decode(T.self, from: data) else {
             // Cheks if we can decode the error
-            throw URLSession.decodeError(decoder: decoder, data: data)
+            throw try URLSession.decodeError(decoder: decoder, data: data)
         }
         return value
     }
