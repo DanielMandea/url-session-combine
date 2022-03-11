@@ -15,12 +15,22 @@ enum SessionError: Error, Identifiable {
     case text(error: TextError)
     case generic(error: Error)
     
-    var errorDescription: String? {
+    var errorDescription: String {
         switch self {
         case .unknown: return "Unknown error"
         case .decode: return "Unknown decoding error"
         case .network(let error): return error.localizedDescription
-        case .text(let error): return error.error
+        case .text(let error): return error.error ?? "Unknown"
+        case .generic(let error): return error.localizedDescription
+        }
+    }
+    
+    var localizedDescription: String {
+        switch self {
+        case .unknown: return "Unknown error"
+        case .decode: return "Unknown decoding error"
+        case .network(let error): return error.localizedDescription
+        case .text(let error): return error.error ?? "Unknown"
         case .generic(let error): return error.localizedDescription
         }
     }
